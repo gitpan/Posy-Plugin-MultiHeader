@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Posy-Plugin-MultiHeader
+version: 0.01
+author:
+  - Kathryn Andersen
+abstract: Posy plugin to enable multiple header templates.
+license: perl
+requires:
+  Posy: 0.93
+build_requires:
+  Test::More: 0
+provides:
+  Posy::Plugin::MultiHeader:
+    file: lib/Posy/Plugin/MultiHeader.pm
+    version: 0.01
+generated_by: Module::Build version 0.2608
