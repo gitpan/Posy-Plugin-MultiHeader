@@ -7,11 +7,11 @@ Posy::Plugin::MultiHeader - Posy plugin to enable multiple header templates.
 
 =head1 VERSION
 
-This describes version B<0.01> of Posy::Plugin::MultiHeader.
+This describes version B<0.02> of Posy::Plugin::MultiHeader.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
