@@ -7,11 +7,11 @@ Posy::Plugin::MultiHeader - Posy plugin to enable multiple header templates.
 
 =head1 VERSION
 
-This describes version B<0.02> of Posy::Plugin::MultiHeader.
+This describes version B<0.03> of Posy::Plugin::MultiHeader.
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -32,6 +32,10 @@ one can make multi-level headers which change depending on the sorted-by
 
 This plugin replaces the 'header' action.
 
+=head2 Cautions
+
+This does not play well with 'footer' templates.
+
 =head2 Configuration
 
 This expects configuration settings in the $self->{config} hash,
@@ -42,7 +46,8 @@ file in the data directory.
 
 =item B<multi_header_max>
 
-The maximum number of additional header levels to look for. (default: 4)
+The maximum number of additional header levels to look for. (default: 0)
+Set this to a number greater than zero to turn on this plugin.
 
 =back
 
@@ -62,7 +67,7 @@ sub init {
     $self->SUPER::init();
 
     # set defaults
-    $self->{config}->{multi_header_max} = 4
+    $self->{config}->{multi_header_max} = 0
 	if (!defined $self->{config}->{multi_header_max});
 } # init
 
@@ -86,34 +91,41 @@ sub header {
     my $current_entry = shift;
     my $entry_state = shift;
 
-    my $header0 = $flow_state->{header}; # remember old header
-    $self->SUPER::header($flow_state, $current_entry, $entry_state);
-
-    if (!exists $flow_state->{headers})
+    if ($self->{config}->{multi_header_max} > 0)
     {
-	$flow_state->{headers} = [];
+	my $header0 = $flow_state->{header}; # remember old header
+	$self->SUPER::header($flow_state, $current_entry, $entry_state);
+
+	if (!exists $flow_state->{headers})
+	{
+	    $flow_state->{headers} = [];
+	}
+	my %vars = $self->set_vars($flow_state, $current_entry, $entry_state);
+
+	# if the 'header' has changed, then all lower headers must be displayed
+	my $header_change = ($header0 ne $flow_state->{header});
+	# iterate through the headers
+	for (my $i=1; ($i - 1) < $self->{config}->{multi_header_max}; $i++)
+	{
+	    my $template = $self->get_template("header$i");
+	    # give up if there aren't any
+	    if (!defined $template)
+	    {
+		last;
+	    }
+	    my $header1 = $self->interpolate("header$i", $template, \%vars);
+	    if ($header_change
+		or $header1 ne $flow_state->{headers}->[$i])
+	    {
+		push @{$flow_state->{page_body}}, $header1;
+		$flow_state->{headers}->[$i] = $header1;
+		$header_change = 1;
+	    }
+	}
     }
-    my %vars = $self->set_vars($flow_state, $current_entry, $entry_state);
-
-    # if the 'header' has changed, then all lower headers must be displayed
-    my $header_change = ($header0 ne $flow_state->{header});
-    # iterate through the headers
-    for (my $i=1; $i < $self->{config}->{multi_header_max}; $i++)
+    else
     {
-	my $template = $self->get_template("header$i");
-	# give up if there aren't any
-	if (!defined $template)
-	{
-	    last;
-	}
-	my $header1 = $self->interpolate("header$i", $template, \%vars);
-	if ($header_change
-	    or $header1 ne $flow_state->{headers}->[$i])
-	{
-	    push @{$flow_state->{page_body}}, $header1;
-	    $flow_state->{headers}->[$i] = $header1;
-	    $header_change = 1;
-	}
+	$self->SUPER::header($flow_state, $current_entry, $entry_state);
     }
     1;	
 } # header

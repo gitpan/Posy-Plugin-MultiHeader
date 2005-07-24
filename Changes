@@ -1,6 +1,14 @@
 Revision history for Posy-Plugin-MultiHeader
 ============================================
 
+0.03 Sat 23 July 2005
+---------------------
+
+  * (23 Jul 2005) efficiency and defaults
+  	Changed the default multi_header_max to zero so that this is
+  disabled by default.  Thus this doesn't waste time looking for multi
+  headers when there aren't any.
+
 0.02 Thu 12 May 2005
 --------------------
 

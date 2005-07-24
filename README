@@ -6,7 +6,7 @@ Posy::Plugin::MultiHeader - Posy plugin to enable multiple header templates.
 
 ==== VERSION ====
 
-This describes version ``0.02'' of Posy::Plugin::MultiHeader.
+This describes version ``0.03'' of Posy::Plugin::MultiHeader.
 
 
 ==== DESCRIPTION ====
@@ -22,6 +22,11 @@ fields.
 This plugin replaces the 'header' action.
 
 
+==   Cautions   ==
+
+This does not play well with 'footer' templates.
+
+
 ==   Configuration   ==
 
 This expects configuration settings in the $self->{config} hash, which, in
@@ -29,7 +34,8 @@ the default Posy setup, can be defined in the main "config" file in the data
 directory.
 
 ``multi_header_max''
-The maximum number of additional header levels to look for. (default: 4)
+The maximum number of additional header levels to look for. (default: 0) Set
+this to a number greater than zero to turn on this plugin.
 
 
 ==== INSTALLATION ====
